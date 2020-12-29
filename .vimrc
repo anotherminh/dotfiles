@@ -50,7 +50,7 @@ set mouse=a
 " color scheme
 colorscheme solarized
 set t_Co=16
-set background=light
+set background=dark
 
 " leader mappings
 nnoremap <Leader>q :qa<CR>
