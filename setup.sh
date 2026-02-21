@@ -94,12 +94,22 @@ else
 fi
 
 echo '-----------------------'
+echo 'Merging zsh config'
+
+DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+SOURCE_LINE="source \"${DOTFILES_DIR}/zshrc\""
+
+if [ -f ~/.zshrc ] && grep -qF "$SOURCE_LINE" ~/.zshrc; then
+  echo "zshrc already sourced from dotfiles, skipping"
+else
+  echo "" >> ~/.zshrc
+  echo "# Custom dotfiles config" >> ~/.zshrc
+  echo "$SOURCE_LINE" >> ~/.zshrc
+  echo "Appended dotfiles source line to ~/.zshrc"
+fi
+
+echo '-----------------------'
 echo 'Configure Finder to show hidden files'
 defaults write com.apple.Finder AppleShowAllFiles true
 
-echo '-----------------------'
-echo 'Load .zshrc'
-
-source "${HOME}/.zshrc"
-
-echo "Done setting up!"
+echo "Done setting up! Open a new terminal to load your zsh config."
