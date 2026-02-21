@@ -3,7 +3,8 @@
 # -------------------------------------------------------------------
 
 # Add custom functions directory to fpath
-fpath=("$MAIN_DIR/.devcontainer/zsh-functions" $fpath)
+DOTFILES_DIR="${0:A:h}"
+fpath=("$DOTFILES_DIR/zsh-functions" $fpath)
 
 # Load zsh functions
 autoload ${fpath[1]}/*(:t)
