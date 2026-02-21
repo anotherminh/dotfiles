@@ -10,8 +10,9 @@ fpath=("$DOTFILES_DIR/zsh-functions" $fpath)
 autoload ${fpath[1]}/*(:t)
 
 # -------------------------------------------------------------------
-# Aliases | Git
+# Aliases
 # -------------------------------------------------------------------
+alias v="vim"
 alias g="git"
 alias p="push"
 alias grc="git rebase --continue"
