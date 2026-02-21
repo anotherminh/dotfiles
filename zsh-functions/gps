@@ -1,0 +1,10 @@
+# "git pick set" -- set the branch that you want to start cherry picking from
+gps() {
+  if [[ $# -eq 0 ]]; then
+    CHERRY_PICK_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    export CHERRY_PICK_BRANCH
+  else
+    export CHERRY_PICK_BRANCH="$1"
+  fi
+  echo "CHERRY_PICK_BRANCH set=${CHERRY_PICK_BRANCH}"
+}

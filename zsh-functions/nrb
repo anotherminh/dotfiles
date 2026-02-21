@@ -1,0 +1,16 @@
+# Create a new branch off of your current branch and push to origin
+nrb() {
+  if [[ $# -eq 0 ]]; then
+    echo "Must provide the name of the branch i.e. 'my-new-feature'"
+  else
+    local USER
+    USER=${GITHUB_USER:?}
+
+    # replace all special chars with '-'
+    local SAFE_BRANCH
+    SAFE_BRANCH=$(echo "$1" | sed -e 's/[^a-zA-Z\/0-9-]/-/g')
+
+    git checkout -b "${USER:l}/${SAFE_BRANCH}"
+    git push -u origin "${USER:l}/${SAFE_BRANCH}"
+  fi
+}

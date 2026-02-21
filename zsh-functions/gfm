@@ -1,0 +1,14 @@
+# Merge a branch into your branch
+gfm() {
+  # Get the git repository root folder name (works from any subfolder)
+  repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
+  repo_name="$(basename "${repo_root}")"
+  DEFAULT_BASE="main" && [[ "${repo_name}" == "main" ]] && DEFAULT_BASE="dev"
+
+  BASE=${1:-${DEFAULT_BASE}}
+  if git branch | grep -E -q "^[[:space:]]+${BASE}$"; then
+    git checkout "${BASE}" && (git pull || git pull) && git checkout - && git merge "${BASE}" -m "merges ${BASE}"
+  else
+    echo "Branch does not exist or you are currently on that branch: ${BASE}"
+  fi
+}

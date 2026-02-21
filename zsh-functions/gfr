@@ -1,0 +1,12 @@
+# Rebase your branch to another branch
+gfr() {
+  if [[ $# -eq 0 ]]; then
+    echo "Must provide the name of the branch to rebase i.e. 'gfr dev'"
+  else
+    if git branch | grep -E -q "^[[:space:]]+$1$"; then
+      git fetch && git rebase -i "origin/$1"
+    else
+      echo "Branch does not exist or you are currently on that branch: $1"
+    fi
+  fi
+}

@@ -1,0 +1,12 @@
+# "git pick" - pick off file changes from another branch
+gp() {
+  if [[ -z "${CHERRY_PICK_BRANCH}" ]]; then
+    echo "Missing env CHERRY_PICK_BRANCH, set with command 'gps myusername/mybranch'"
+  else
+    if [[ $# -eq 0 ]]; then
+      echo "Must provide the name of the file to pick, i.e. 'gp .editorconfig'"
+    else
+      git checkout "${CHERRY_PICK_BRANCH}" "$1"
+    fi
+  fi
+}

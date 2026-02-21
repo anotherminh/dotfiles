@@ -4,87 +4,102 @@ set -e
 echo '-----------------------'
 echo 'xcode & git'
 
-install_xcode() {
-  echo "Installing xcode..."
+if git --version &>/dev/null; then
+  echo "git already installed, skipping xcode-select"
+else
+  echo "Installing xcode command line tools..."
   xcode-select --install
-  echo GIT_VERSION: $GIT_VERSION
   echo 'xcode installed!'
-}
-
-git --version || install_xcode
+fi
 
 echo '-----------------------'
-echo 'Installing zsh'
+echo 'oh-my-zsh'
 
-# Install zsh
-if [ ! -d ~/.oh-my-zsh ]
-then
-    echo "Installing zsh..."
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [ -d ~/.oh-my-zsh ]; then
+  echo "oh-my-zsh already installed, skipping"
+else
+  echo "Installing oh-my-zsh..."
+  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
 echo '-----------------------'
 echo 'Setting shell to zsh'
 
-chsh -s /bin/zsh
+if [ "$SHELL" = "/bin/zsh" ]; then
+  echo "Shell is already zsh, skipping"
+else
+  chsh -s /bin/zsh
+fi
 
 echo '-----------------------'
-echo 'Install brew & brew-managed packages'
+echo 'brew & brew-managed packages'
 
-# Install brew
-brew --version || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+if brew --version &>/dev/null; then
+  echo "Homebrew already installed"
+else
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
 brew update
 brew upgrade
 brew install zsh-autosuggestions jq
 
 echo '-----------------------'
-echo 'Git Stuff'
+echo 'Git config'
 
-# GITHUB_EMAIL="minhngocln@gmail.com"
-# GITHUB_NAME="anotherminh"
-# git config --global user.name "$GITHUB_NAME"
-# git config --global user.email "$GITHUB_EMAIL"
-
-# echo 'Generating ssh keys to authenticate to github'
-
-# ssh-keygen -t rsa -b 4096 -C "$GITHUB_EMAIL" -N '' -f ~/.ssh/id_rsa
-# eval "$(ssh-agent -s)"
-# ssh-add -K ~/.ssh/id_rsa
-
-# echo 'Writing ssh config'
-# SSH_CONFIG="$HOME/.ssh/config"
-# cat > "$SSH_CONFIG" <<config
-# Host *
-#   AddKeysToAgent yes
-#   UseKeychain yes
-#   IdentityFile ~/.ssh/id_ed25519
-# config
-
-# pbcopy < ~/.ssh/id_ed25519.pub
-# open https://github.com/settings/ssh/new
+GITHUB_EMAIL="minhngoc.ln@gmail.com"
+GITHUB_NAME="anotherminh"
+git config --global user.name "$GITHUB_NAME"
+git config --global user.email "$GITHUB_EMAIL"
 
 echo '-----------------------'
-echo 'Installing git prompt'
+echo 'SSH keys'
 
-pushd ~/
-rm -rf zsh-git-prompt
-git clone git@github.com:olivierverdier/zsh-git-prompt.git
-popd
+SSH_KEY="$HOME/.ssh/id_ed25519"
 
-echo '-----------------------'
-echo 'Vim stuff'
-if [ ! -d ~/.vim/bundle/Vundle.vim ]
-then
-  echo 'Installing Vundle...'
-  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+if [ -f "$SSH_KEY" ]; then
+  echo "SSH key already exists at $SSH_KEY, skipping generation"
+else
+  echo "Generating SSH key..."
+  ssh-keygen -t ed25519 -C "$GITHUB_EMAIL" -N '' -f "$SSH_KEY"
+  eval "$(ssh-agent -s)"
+  ssh-add --apple-use-keychain "$SSH_KEY"
+
+  echo 'Writing ssh config'
+  SSH_CONFIG="$HOME/.ssh/config"
+  if [ ! -f "$SSH_CONFIG" ]; then
+    cat > "$SSH_CONFIG" <<config
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+config
+  else
+    echo "SSH config already exists, skipping"
+  fi
+
+  pbcopy < "${SSH_KEY}.pub"
+  echo "Public key copied to clipboard. Opening GitHub SSH settings..."
+  open https://github.com/settings/ssh/new
 fi
 
-cp ./.vimrc ~/.vimrc
-vim +PluginInstall +qall
+echo '-----------------------'
+echo 'zsh-git-prompt'
+
+if [ -d ~/zsh-git-prompt ]; then
+  echo "zsh-git-prompt already installed, skipping"
+else
+  git clone https://github.com/olivierverdier/zsh-git-prompt.git ~/zsh-git-prompt
+fi
 
 echo '-----------------------'
-
+echo 'Configure Finder to show hidden files'
 defaults write com.apple.Finder AppleShowAllFiles true
 
-echo "Done setting up!"
+echo '-----------------------'
+echo 'Load .zshrc'
 
+source "${HOME}/.zshrc"
+
+echo "Done setting up!"

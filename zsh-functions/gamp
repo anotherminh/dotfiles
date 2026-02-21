@@ -1,0 +1,8 @@
+# Add all files with a commit message and push to origin
+gamp() {
+  if [[ $# -eq 0 ]]; then
+    echo "No commit message supplied"
+  else
+    git add -A && git commit --m "$1" && git push
+  fi
+}
