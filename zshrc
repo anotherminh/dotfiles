@@ -10,6 +10,33 @@ fpath=("$DOTFILES_DIR/zsh-functions" $fpath)
 autoload ${fpath[1]}/*(:t)
 
 # -------------------------------------------------------------------
+# Prompt (vcs_info)
+# -------------------------------------------------------------------
+
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' stagedstr '%F{green}+%f'
+zstyle ':vcs_info:*' unstagedstr '%F{red}*%f'
+zstyle ':vcs_info:git:*' formats       ' %F{cyan}%b%f%u%c%m'
+zstyle ':vcs_info:git:*' actionformats ' %F{cyan}%b%f|%F{yellow}%a%f%u%c%m'
+
+zstyle ':vcs_info:git*+set-message:*' hooks git-st
+function +vi-git-st() {
+    local ahead behind
+    ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
+    behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
+    local -a gitstatus
+    (( ahead )) && gitstatus+=("%F{green}↑${ahead}%f")
+    (( behind )) && gitstatus+=("%F{red}↓${behind}%f")
+    hook_com[misc]+="${(j: :)gitstatus:+ ${(j: :)gitstatus}}"
+}
+
+setopt PROMPT_SUBST
+precmd() { vcs_info }
+PROMPT='%F{blue}%~%f${vcs_info_msg_0_} %# '
+
+# -------------------------------------------------------------------
 # Aliases
 # -------------------------------------------------------------------
 alias v="vim"
